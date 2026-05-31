@@ -1,0 +1,10 @@
+{
+  "item-resin-solution-filtered": "수지 용액",
+  "item-resin-solution-unfiltered": "수지 용액",
+  "itemdesc-resin-solution-filtered": "여과됨",
+  "itemdesc-resin-solution-unfiltered": "여과되지 않음",
+  "incontainer-item-resin-solution-filtered": "여과한 수지 용액",
+  "incontainer-item-resin-solution-unfiltered": "여과하지 않은 수지 용액",
+  "item-handbooktitle-resin-solution": "수지 끓이기",
+  "item-handbooktext-resin-solution": "소나무 또는 아카시아 판자는 조리 냄비에서 aqua vitae와 함께 끓일 수 있습니다. aqua vitae 한 칸과 소나무 또는 아카시아 판자 세 칸을 사용하세요. 1에서 6까지 같은 묶음 수를 넣으면 그 수만큼 여과하지 않은 수지 용액 분량이 만들어집니다. 이 과정은 냄비를 더럽힙니다."
+}

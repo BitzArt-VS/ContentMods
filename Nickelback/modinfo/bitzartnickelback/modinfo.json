@@ -1,0 +1,15 @@
+{
+  "$schema": "https://moddbcdn.vintagestory.at/schema/modinfo.latest.json",
+  "type": "Code",
+  "modid": "bitzartnickelback",
+  "name": "Nickelback",
+  "authors": [
+    "BitzArt"
+  ],
+  "description": "Gives you bits of metal back when a tool made of iron, meteoric iron, or steel breaks during quenching.",
+  "version": "CustomBuild",
+  "website": "https://github.com/BitzArt-VS/ContentMods",
+  "dependencies": {
+    "game": "*"
+  }
+}

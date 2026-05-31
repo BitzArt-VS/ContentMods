@@ -1,0 +1,15 @@
+{
+  "$schema": "https://moddbcdn.vintagestory.at/schema/modinfo.latest.json",
+  "type": "Content",
+  "modid": "bitzartwncresin",
+  "name": "We Need to Cook (Resin)",
+  "authors": [
+    "BitzArt"
+  ],
+  "description": "Produce resin chemically from pine or acacia wood",
+  "version": "CustomBuild",
+  "website": "https://github.com/BitzArt-VS/ContentMods",
+  "dependencies": {
+    "game": "*"
+  }
+}
