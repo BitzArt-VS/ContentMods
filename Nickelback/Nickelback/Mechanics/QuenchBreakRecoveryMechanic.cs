@@ -17,7 +17,10 @@ internal static class QuenchBreakRecoveryMechanic
     private const double MinScatterHorizontalVelocity = 0.01;
     private const double MaxScatterHorizontalVelocity = 0.08;
     private const double MinScatterVerticalVelocity = 0.01;
-    private const double MaxScatterVerticalVelocity = 0.08;
+    private const double MaxScatterVerticalVelocity = 0.10;
+
+    private const int MinDroppedBitStackSize = 1;
+    private const int MaxDroppedBitStackSize = 4;
 
     private static readonly int MinRecoveredBits = (int)Math.Floor(BitsPerItem * MinRecoveryRatio);
     private static readonly int MaxRecoveredBits = (int)Math.Floor(BitsPerItem * MaxRecoveryRatio);
@@ -30,7 +33,8 @@ internal static class QuenchBreakRecoveryMechanic
     {
         ["iron"] = "iron",
         ["steel"] = "iron",
-        ["meteoriciron"] = "meteoriciron"
+        ["meteoriciron"] = "meteoriciron",
+        ["meteoricsteel"] = "meteoriciron",
     };
 
     internal static void Recover(
@@ -57,14 +61,20 @@ internal static class QuenchBreakRecoveryMechanic
         }
 
         var recoveredBitCount = world.Rand.Next(MinRecoveredBits, MaxRecoveredBits + 1);
+        var remainingBitCount = recoveredBitCount;
 
-        for (var i = 0; i < recoveredBitCount; i++)
+        while (remainingBitCount > 0)
         {
+            var droppedStackSize = Math.Min(
+                world.Rand.Next(MinDroppedBitStackSize, MaxDroppedBitStackSize + 1),
+                remainingBitCount);
+
             var bitStack = new ItemStack(bitItem)
             {
-                StackSize = 1
+                StackSize = droppedStackSize
             };
 
+            remainingBitCount -= droppedStackSize;
             world.SpawnItemEntity(bitStack, pos, GetScatterVelocity(world));
         }
     }
