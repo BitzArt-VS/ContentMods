@@ -8,36 +8,13 @@ namespace BitzArt.Nickelback.Mechanics;
 
 internal static class QuenchBreakRecoveryMechanic
 {
-    private const int BitsPerItem = 20;
-
-    private const double MaxRecoveryRatio = 1;
-    private const double MaxLossRatio = 0.1;
-    private const double MinRecoveryRatio = MaxRecoveryRatio - MaxLossRatio;
-
-    private const double MinScatterHorizontalVelocity = 0.01;
-    private const double MaxScatterHorizontalVelocity = 0.08;
-    private const double MinScatterVerticalVelocity = 0.01;
-    private const double MaxScatterVerticalVelocity = 0.10;
-
-    private const int MinDroppedBitStackSize = 1;
-    private const int MaxDroppedBitStackSize = 4;
-
-    private static readonly int MinRecoveredBits = (int)Math.Floor(BitsPerItem * MinRecoveryRatio);
-    private static readonly int MaxRecoveredBits = (int)Math.Floor(BitsPerItem * MaxRecoveryRatio);
+    private static ModConfig Config => ModConfig.Instance!;
 
     private static readonly FieldInfo MetalGroupCodeField =
         AccessTools.Field(typeof(CollectibleBehaviorQuenchable), "metalGroupCode")
         ?? throw new MissingFieldException(nameof(CollectibleBehaviorQuenchable), "metalGroupCode");
 
-    private static readonly Dictionary<string, string> RecoveredMetalByOriginalMetal = new()
-    {
-        ["iron"] = "iron",
-        ["steel"] = "iron",
-        ["meteoriciron"] = "meteoriciron",
-        ["meteoricsteel"] = "meteoriciron",
-    };
-
-    internal static void Recover(
+    internal static void RecoverBits(
         CollectibleBehaviorQuenchable quenchableBehavior,
         IWorldAccessor world,
         ItemSlot slot,
@@ -60,22 +37,22 @@ internal static class QuenchBreakRecoveryMechanic
             return;
         }
 
-        var recoveredBitCount = world.Rand.Next(MinRecoveredBits, MaxRecoveredBits + 1);
-        var remainingBitCount = recoveredBitCount;
+        var remainingBits = world.GetRandomValue(Config.RecoveredBits);
 
-        while (remainingBitCount > 0)
+        while (remainingBits > 0)
         {
-            var droppedStackSize = Math.Min(
-                world.Rand.Next(MinDroppedBitStackSize, MaxDroppedBitStackSize + 1),
-                remainingBitCount);
+            var stackSize = world.GetRandomValue(Config.Scatter.StackSize);
 
-            var bitStack = new ItemStack(bitItem)
+            if (stackSize > remainingBits)
             {
-                StackSize = droppedStackSize
-            };
+                stackSize = remainingBits;
+            }
 
-            remainingBitCount -= droppedStackSize;
-            world.SpawnItemEntity(bitStack, pos, GetScatterVelocity(world));
+            ItemStack stack = new(bitItem, stacksize: stackSize);
+
+            world.SpawnItemEntity(stack, pos, GetScatterVelocity(world));
+
+            remainingBits -= stackSize;
         }
     }
 
@@ -98,29 +75,18 @@ internal static class QuenchBreakRecoveryMechanic
             return false;
         }
 
-        return RecoveredMetalByOriginalMetal.TryGetValue(originalMetalVariant, out metal);
+        return Config.RecoverMetal.TryGetValue(originalMetalVariant, out metal);
     }
 
     private static Vec3d GetScatterVelocity(IWorldAccessor world)
     {
         var angle = world.Rand.NextDouble() * Math.PI * 2;
-        var horizontalVelocity = GetRandomDouble(
-            world,
-            MinScatterHorizontalVelocity,
-            MaxScatterHorizontalVelocity);
-        var verticalVelocity = GetRandomDouble(
-            world,
-            MinScatterVerticalVelocity,
-            MaxScatterVerticalVelocity);
+        var horizontalVelocity = world.GetRandomValue(Config.Scatter.HorizontalVelocity);
+        var verticalVelocity = world.GetRandomValue(Config.Scatter.VerticalVelocity);
 
         return new Vec3d(
             Math.Cos(angle) * horizontalVelocity,
             verticalVelocity,
             Math.Sin(angle) * horizontalVelocity);
-    }
-
-    private static double GetRandomDouble(IWorldAccessor world, double min, double max)
-    {
-        return min + world.Rand.NextDouble() * (max - min);
     }
 }

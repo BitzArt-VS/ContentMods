@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using HarmonyLib;
 using Vintagestory.API.Common;
@@ -8,29 +9,37 @@ public sealed class NickelbackModSystem : ModSystem
 {
     internal const string ModId = "bitzartnickelback";
 
-    internal static ILogger Logger { get; private set; } = null!;
-    internal static ICoreAPI Api { get; private set; } = null!;
-
-    private Harmony? harmony;
+    private Harmony? _harmony;
 
     public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Server;
 
     public override void Start(ICoreAPI api)
     {
-        Api = api;
-        Logger = Mod.Logger;
+        try
+        {
+            if (_harmony is not null)
+            {
+                throw new UnreachableException("Harmony is already initialized. This should never happen.");
+            }
 
-        harmony ??= new Harmony(ModId);
-        harmony.PatchAll(Assembly.GetExecutingAssembly());
+            ModConfig.Load(api);
+
+            _harmony = new Harmony(ModId);
+            _harmony.PatchAll(Assembly.GetExecutingAssembly());
+        }
+        catch (Exception ex)
+        {
+            api.Logger.Error("Nickelback: Failed to initialize. Mod will not start.");
+            api.Logger.Error(ex);
+
+            return;
+        }
     }
 
     public override void Dispose()
     {
-        harmony?.UnpatchAll(ModId);
-        harmony = null;
-
-        Api = null!;
-        Logger = null!;
+        _harmony?.UnpatchAll(ModId);
+        _harmony = null;
 
         base.Dispose();
     }

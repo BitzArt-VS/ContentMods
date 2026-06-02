@@ -40,6 +40,6 @@ internal static class QuenchBreakRecoveryPatch
         ItemSlot slot,
         Vec3d pos)
     {
-        QuenchBreakRecoveryMechanic.Recover(quenchableBehavior, world, slot, pos);
+        QuenchBreakRecoveryMechanic.RecoverBits(quenchableBehavior, world, slot, pos);
     }
 }
